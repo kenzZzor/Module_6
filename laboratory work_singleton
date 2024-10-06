@@ -1,0 +1,68 @@
+public enum LogLevel
+{
+    INFO,
+    WARNING,
+    ERROR
+}
+
+public class Logger
+{
+    private static Logger _instance;
+    private static readonly object _lock = new object();
+    private LogLevel _currentLogLevel = LogLevel.INFO;
+    private string _logFilePath = "log.txt";
+
+    private Logger() {}
+
+    public static Logger GetInstance()
+    {
+        if (_instance == null)
+        {
+            lock (_lock)
+            {
+                if (_instance == null)
+                {
+                    _instance = new Logger();
+                }
+            }
+        }
+        return _instance;
+    }
+
+    public void Log(string message, LogLevel level)
+    {
+        if (level >= _currentLogLevel)
+        {
+            lock (_lock)
+            {
+                using (StreamWriter writer = new StreamWriter(_logFilePath, true))
+                {
+                    writer.WriteLine($"{DateTime.Now} [{level}] {message}");
+                }
+            }
+        }
+    }
+
+    public void SetLogLevel(LogLevel level)
+    {
+        _currentLogLevel = level;
+    }
+
+    public void SetLogFilePath(string path)
+    {
+        _logFilePath = path;
+    }
+
+    public void ReadLogs()
+    {
+        if (File.Exists(_logFilePath))
+        {
+            string logs = File.ReadAllText(_logFilePath);
+            Console.WriteLine(logs);
+        }
+        else
+        {
+            Console.WriteLine("Файл логов не найден.");
+        }
+    }
+}
