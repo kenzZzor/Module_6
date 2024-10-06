@@ -1,0 +1,175 @@
+public interface IPrototype
+{
+    IPrototype Clone();
+}
+
+public class Section : IPrototype
+{
+    public string Title { get; set; }
+    public string Content { get; set; }
+
+    public Section(string title, string content)
+    {
+        Title = title;
+        Content = content;
+    }
+
+    public IPrototype Clone()
+    {
+        return new Section(Title, Content);
+    }
+
+    public override string ToString()
+    {
+        return $"Раздел: {Title}, Содержание: {Content}";
+    }
+}
+
+public class Image : IPrototype
+{
+    public string URL { get; set; }
+
+    public Image(string url)
+    {
+        URL = url;
+    }
+
+    public IPrototype Clone()
+    {
+        return new Image(URL);
+    }
+
+    public override string ToString()
+    {
+        return $"Изображение: {URL}";
+    }
+}
+
+using System.Collections.Generic;
+
+public class Document : IPrototype
+{
+    public string Title { get; set; }
+    public string Content { get; set; }
+    public List<Section> Sections { get; set; } = new List<Section>();
+    public List<Image> Images { get; set; } = new List<Image>();
+
+    public Document(string title, string content)
+    {
+        Title = title;
+        Content = content;
+    }
+
+    public void AddSection(Section section)
+    {
+        Sections.Add(section);
+    }
+
+    public void AddImage(Image image)
+    {
+        Images.Add(image);
+    }
+
+    public IPrototype Clone()
+    {
+        var clonedDocument = new Document(Title, Content);
+
+        // Клонирование разделов
+        foreach (var section in Sections)
+        {
+            clonedDocument.AddSection((Section)section.Clone());
+        }
+
+        // Клонирование изображений
+        foreach (var image in Images)
+        {
+            clonedDocument.AddImage((Image)image.Clone());
+        }
+
+        return clonedDocument;
+    }
+
+    public override string ToString()
+    {
+        string docString = $"Документ: {Title}, Содержание: {Content}\n";
+        docString += "Разделы:\n";
+        foreach (var section in Sections)
+        {
+            docString += section + "\n";
+        }
+        docString += "Изображения:\n";
+        foreach (var image in Images)
+        {
+            docString += image + "\n";
+        }
+        return docString;
+    }
+}
+
+
+// Дополнительное задание
+public class Table : IPrototype
+{
+    public string Name { get; set; }
+    public string Data { get; set; }
+
+    public Table(string name, string data)
+    {
+        Name = name;
+        Data = data;
+    }
+
+    public IPrototype Clone()
+    {
+        return new Table(Name, Data);
+    }
+
+    public override string ToString()
+    {
+        return $"Таблица: {Name}, Данные: {Data}";
+    }
+}
+
+public class DocumentManager
+{
+    public Document CreateDocument(IPrototype prototype)
+    {
+        return (Document)prototype.Clone();
+    }
+}
+
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем оригинальный документ
+        Document originalDocument = new Document("Технический отчёт", "Это основной технический отчёт.");
+        originalDocument.AddSection(new Section("Введение", "Описание проекта."));
+        originalDocument.AddSection(new Section("Заключение", "Выводы по проекту."));
+        originalDocument.AddImage(new Image("https://example.com/image1.jpg"));
+        originalDocument.AddImage(new Image("https://example.com/image2.jpg"));
+
+        Console.WriteLine("Оригинальный документ:");
+        Console.WriteLine(originalDocument);
+
+        // Создаем менеджер документов
+        DocumentManager documentManager = new DocumentManager();
+
+        // Клонируем 
+        Document clonedDocument = documentManager.CreateDocument(originalDocument);
+
+        // Модифицируем клон
+        clonedDocument.Title = "Клон отчёта";
+        clonedDocument.AddSection(new Section("Новый раздел", "Это добавленный раздел."));
+        clonedDocument.AddImage(new Image("https://example.com/newimage.jpg"));
+
+        Console.WriteLine("\nКлонированный и модифицированный документ:");
+        Console.WriteLine(clonedDocument);
+
+        // Проверяем, что оригинальный документ не изменился
+        Console.WriteLine("\nОригинальный документ после клонирования:");
+        Console.WriteLine(originalDocument);
+    }
+}
+
