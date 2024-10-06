@@ -1,0 +1,104 @@
+public class Computer
+{
+    public string CPU { get; set; }
+    public string RAM { get; set; }
+    public string Storage { get; set; }
+    public string GPU { get; set; }
+    public string OS { get; set; }
+
+    // Дополнительные опции
+    public string Cooling { get; set; }
+    public string PowerSupply { get; set; }
+
+    public override string ToString()
+    {
+        return $"Компьютер: CPU - {CPU}, RAM - {RAM}, Накопитель - {Storage}, GPU - {GPU}, ОС - {OS}, " +
+               $"Охлаждение - {Cooling}, Блок питания - {PowerSupply}";
+    }
+}
+
+public interface IComputerBuilder
+{
+    void SetCPU();
+    void SetRAM();
+    void SetStorage();
+    void SetGPU();
+    void SetOS();
+    void SetCooling();        // Дополнительные параметры
+    void SetPowerSupply();    // Дополнительные параметры
+    Computer GetComputer();
+}
+
+//  Builders
+public class OfficeComputerBuilder : IComputerBuilder
+{
+    private Computer _computer = new Computer();
+
+    public void SetCPU() => _computer.CPU = "Intel i3";
+    public void SetRAM() => _computer.RAM = "8GB";
+    public void SetStorage() => _computer.Storage = "1TB HDD";
+    public void SetGPU() => _computer.GPU = "Integrated";
+    public void SetOS() => _computer.OS = "Windows 10";
+    public void SetCooling() => _computer.Cooling = "Стандартное воздушное охлаждение";
+    public void SetPowerSupply() => _computer.PowerSupply = "400W Блок питания";
+
+    public Computer GetComputer() => _computer;
+}
+
+public class GamingComputerBuilder : IComputerBuilder
+{
+    private Computer _computer = new Computer();
+
+    public void SetCPU() => _computer.CPU = "Intel i9";
+    public void SetRAM() => _computer.RAM = "32GB";
+    public void SetStorage() => _computer.Storage = "1TB SSD";
+    public void SetGPU() => _computer.GPU = "NVIDIA RTX 3080";
+    public void SetOS() => _computer.OS = "Windows 11";
+    public void SetCooling() => _computer.Cooling = "Водяное охлаждение";
+    public void SetPowerSupply() => _computer.PowerSupply = "750W Блок питания";
+
+    public Computer GetComputer() => _computer;
+}
+// Дополнительный строитель
+public class ServerComputerBuilder : IComputerBuilder
+{
+    private Computer _computer = new Computer();
+
+    public void SetCPU() => _computer.CPU = "Intel Xeon";
+    public void SetRAM() => _computer.RAM = "64GB";
+    public void SetStorage() => _computer.Storage = "2TB SSD";
+    public void SetGPU() => _computer.GPU = "Integrated";
+    public void SetOS() => _computer.OS = "Linux";
+    public void SetCooling() => _computer.Cooling = "Серверное охлаждение";
+    public void SetPowerSupply() => _computer.PowerSupply = "1000W Блок питания";
+
+    public Computer GetComputer() => _computer;
+}
+
+
+//Director
+public class ComputerDirector
+{
+    private IComputerBuilder _builder;
+
+    public ComputerDirector(IComputerBuilder builder)
+    {
+        _builder = builder;
+    }
+
+    public void ConstructComputer()
+    {
+        _builder.SetCPU();
+        _builder.SetRAM();
+        _builder.SetStorage();
+        _builder.SetGPU();
+        _builder.SetOS();
+        _builder.SetCooling();        // Вызов дополнительных методов
+        _builder.SetPowerSupply();    // Вызов дополнительных методов
+    }
+
+    public Computer GetComputer()
+    {
+        return _builder.GetComputer();
+    }
+}
